@@ -1,0 +1,7 @@
+# Netlify settings for the Canopus website (TanStack Start + server functions).
+[build]
+  command = "npm run build:netlify"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

@@ -1,0 +1,1 @@
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS payment_status text NOT NULL DEFAULT 'unpaid', ADD COLUMN IF NOT EXISTS amount_paise integer, ADD COLUMN IF NOT EXISTS razorpay_order_id text, ADD COLUMN IF NOT EXISTS razorpay_payment_id text UNIQUE;

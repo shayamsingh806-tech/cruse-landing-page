@@ -1,0 +1,1 @@
+UPDATE public.experiences SET price_note = 'Children (4–12 yrs): ₹1,500 per child · Infants (below 3 yrs): Free' WHERE slug = 'dinner-cruise';

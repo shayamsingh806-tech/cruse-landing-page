@@ -1,0 +1,5 @@
+REVOKE EXECUTE ON FUNCTION public.add_admin_by_email(text), public.claim_first_admin(), public.list_admins(), public.remove_admin(uuid), public.has_role(uuid, public.app_role) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.add_admin_by_email(text), public.claim_first_admin(), public.list_admins(), public.remove_admin(uuid), public.has_role(uuid, public.app_role) TO authenticated;
+ALTER TABLE public.bookings ADD CONSTRAINT bookings_len CHECK (length(name)<=200 AND length(email)<=200 AND length(phone)<=40 AND length(experience)<=200 AND coalesce(length(notes),0)<=2000 AND guest_count BETWEEN 1 AND 200);
+ALTER TABLE public.enquiries ADD CONSTRAINT enquiries_len CHECK (length(first_name)<=100 AND length(last_name)<=100 AND length(email)<=200 AND length(phone)<=40 AND coalesce(length(message),0)<=3000 AND guest_count BETWEEN 1 AND 1000);
+ALTER TABLE public.contact_messages ADD CONSTRAINT contact_len CHECK (length(name)<=200 AND length(email)<=200 AND coalesce(length(phone),0)<=40 AND length(subject)<=300 AND length(message)<=5000);

@@ -1,0 +1,1 @@
+UPDATE public.experiences SET price = '₹3,500 per person' WHERE slug = 'dinner-cruise';
