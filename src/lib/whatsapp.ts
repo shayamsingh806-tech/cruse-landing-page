@@ -17,14 +17,14 @@ export function openWhatsApp(text: string, number?: string) {
   else window.location.href = url;
 }
 
-type ProductLike = { title: string; slug: string; kind?: string; price?: string; location?: string; timing?: string };
+type ProductLike = { title: string; slug: string; kind?: string; price?: string; originalPrice?: string | undefined; location?: string; timing?: string };
 
 // Pre-typed message for "Book on WhatsApp" buttons on cruises, activities and combos.
 export function productMessage(p: ProductLike) {
   const path = p.kind === "Combo" ? `/combos/${p.slug}` : `/experiences/${p.slug}`;
   return [
     `Hi Canopus Marine! I'm interested in *${p.title}*${p.kind ? ` (${p.kind})` : ""}.`,
-    ...(p.price ? [`Price: ${p.price}`] : []),
+    ...(p.price ? [`Price: ${p.price}${p.originalPrice ? ` (offer — regular ${p.originalPrice})` : ""}`] : []),
     ...(p.location ? [`Location: ${p.location}`] : []),
     ...(p.timing ? [`Timing: ${p.timing}`] : []),
     `Link: ${SITE_URL}${path}`,

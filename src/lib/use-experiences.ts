@@ -36,6 +36,18 @@ export function mergeExperiences(rows: ExperienceRow[] | undefined): Experience[
     const s = staticBySlug.get(r.slug);
     // Keep the code-bundled photo unless the admin supplied a replacement URL.
     if (!x.image && s) { x.image = s.image; x.alt = x.alt || s.alt; }
+    // Offers set in code (discount price, highlights, rating) win over the database copy.
+    if (s?.originalPrice) {
+      x.price = s.price;
+      x.originalPrice = s.originalPrice;
+      if (s.priceNote) x.priceNote = s.priceNote;
+    }
+    if (s?.highlights) {
+      x.highlights = s.highlights;
+      const inc = x.inclusions ?? [];
+      x.inclusions = [...inc, ...s.highlights.filter((h) => !inc.includes(h))];
+    }
+    if (s?.rating) x.rating = s.rating;
     return x;
   };
   const bySlug = new Map(visible.map((r) => [r.slug, withFallback(r)]));

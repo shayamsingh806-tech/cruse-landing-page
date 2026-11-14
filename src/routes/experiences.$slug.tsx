@@ -4,6 +4,7 @@ import { CalendarDays, Clock, MapPin, Users, Volume2, VolumeX } from "lucide-rea
 import { CardsGrid, HeroBanner, SectionHeading } from "@/components/site/sections";
 import { BookingForm } from "@/components/site/BookingForm";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+import { Highlights, OfferPrice, RatingBadge } from "@/components/site/OfferBits";
 import { Lightbox } from "@/components/site/Lightbox";
 import { seo, breadcrumbLd, experienceLd } from "@/lib/seo";
 import { experienceBySlug } from "@/lib/site-data";
@@ -119,6 +120,8 @@ function Page() {
         <div className="mx-auto grid max-w-[1200px] gap-12 px-6 lg:grid-cols-[1fr_360px]">
           <article>
             <SectionHeading kicker="The Experience" title={`Discover ${x.title}`} />
+            {x.rating && <div className="mt-4"><RatingBadge rating={x.rating} /></div>}
+            {x.highlights && <Highlights items={x.highlights} className="mt-4" />}
             <p className="mt-6 text-lg leading-8 text-muted-foreground">{x.overview}</p>
 
             <div className="mt-10 grid grid-cols-2 gap-4 bg-muted p-6">
@@ -231,8 +234,10 @@ function Page() {
 
           <aside className="h-fit bg-card p-7 shadow-lg lg:sticky lg:top-28">
             <p className="text-sm font-bold uppercase text-primary">Book this experience</p>
-            <h2 className="mt-2 text-3xl font-bold">{x.price}</h2>
+            <div className="mt-2"><OfferPrice x={x} /></div>
             {x.priceNote && <p className="mt-2 text-sm text-muted-foreground">{x.priceNote}</p>}
+            {x.highlights && <Highlights items={x.highlights} className="mt-4" />}
+            {x.rating && <div className="mt-4 rounded-md bg-muted px-3 py-2"><RatingBadge rating={x.rating} /></div>}
             <WhatsAppButton product={x} size="lg" className="mt-5 w-full" />
             <p className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">or fill in your details</p>
             <div className="mt-4">
