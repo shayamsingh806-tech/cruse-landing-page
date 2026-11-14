@@ -15,6 +15,7 @@ import { cart, decodeSavedCart, encodeCart, guestPricingMode, hasAgePricing, ite
 import { createCartOrder, confirmCartBooking } from "@/lib/payments.functions";
 import { chatAttribution, markChatConverted } from "@/lib/chat-attribution";
 import { trackChatEvent } from "@/lib/chat-events";
+import { openWhatsApp } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/cart")({
   validateSearch: (s: Record<string, unknown>): { saved?: string; ref?: string } => ({
@@ -102,56 +103,36 @@ function Page() {
   const grand = lines.reduce((a, l) => a + l.total, 0);
   const suggestions = suggestFor(all, items.map((i) => i.title), lines[0]?.exp?.kind);
 
-  async function pay(e: FormEvent<HTMLFormElement>) {
+  // Checkout: send the whole cart + contact details to WhatsApp.
+  function pay(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     if (f.get("website")) return;
-    const contact = { name: String(f.get("name")), phone: String(f.get("phone")), email: String(f.get("email")), notes: String(f.get("notes") ?? ""), source: chatAttribution() };
-    const payload = items.map((i) => {
-      const exp = all.find((x) => x.title === i.title);
+    const contact = { name: String(f.get("name")), phone: String(f.get("phone")), email: String(f.get("email")), notes: String(f.get("notes") ?? "").trim(), source: chatAttribution() };
+    const itemLines = lines.flatMap(({ it, exp, total }, i) => {
       const agePriced = hasAgePricing(exp);
-      return {
-        experience: i.title,
-        booking_date: i.date,
-        guest_count: i.guests,
-        ...(agePriced ? { adults: i.adults ?? i.guests, children: i.children ?? 0, infants: i.infants ?? 0 } : {}),
-      };
+      const guests = agePriced
+        ? `${it.guests} (${it.adults ?? it.guests} adult(s)${it.children ? `, ${it.children} child(ren)` : ""}${it.infants ? `, ${it.infants} infant(s)` : ""})`
+        : String(it.guests);
+      const date = it.date ? new Date(`${it.date}T00:00:00`).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
+      return [`${i + 1}. *${it.title}*`, `   Date: ${date || it.date}`, `   Guests: ${guests}`, ...(total ? [`   Amount: ₹${total.toLocaleString("en-IN")}`] : []), ""];
     });
-    setBusy(true);
-    setStatus("Preparing payment…");
-    trackChatEvent("checkout_start", { items: payload.length, experiences: payload.map((p) => p.experience), total: grand, via_chat: contact.source === "chat", path: "cart" });
-    try {
-      const o = await createOrder({ data: { items: payload } });
-      if (!(await loadRzp()) || !window.Razorpay) throw new Error("load");
-      setStatus("");
-      new window.Razorpay({
-        key: o.keyId,
-        amount: o.amount,
-        currency: "INR",
-        order_id: o.orderId,
-        name: "Canopus Marine",
-        description: `${items.length} experience(s)`,
-        prefill: { name: contact.name, email: contact.email, contact: contact.phone },
-        theme: { color: "#0C417B" },
-        handler: async (r: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
-          setStatus("Confirming payment…");
-          try {
-            await confirm({ data: { order_id: r.razorpay_order_id, payment_id: r.razorpay_payment_id, signature: r.razorpay_signature, items: payload, contact, ...(savedRef() ? { saved_ref: savedRef() } : {}) } });
-            try { localStorage.removeItem(REF_KEY); } catch { /* ignore */ }
-            cart.clear();
-            markChatConverted();
-            setDone(true);
-          } catch {
-            setStatus("Payment received but confirmation failed — please call us, your money is safe.");
-          }
-          setBusy(false);
-        },
-        modal: { ondismiss: () => { setBusy(false); setStatus("Payment cancelled — you can try again."); } },
-      }).open();
-    } catch {
-      setBusy(false);
-      setStatus("Payment could not be started — please try again or call us.");
-    }
+    const message = [
+      "*New Booking Request (Cart) — Canopus Marine website*",
+      "",
+      ...itemLines,
+      ...(grand ? [`*Total: ₹${grand.toLocaleString("en-IN")}*`, ""] : []),
+      `*Name:* ${contact.name}`,
+      `*Phone:* ${contact.phone}`,
+      `*Email:* ${contact.email}`,
+      ...(contact.notes ? [`*Notes:* ${contact.notes}`] : []),
+      "",
+      "Please confirm availability and share payment details.",
+    ].join("\n");
+    openWhatsApp(message);
+    trackChatEvent("checkout_start", { items: items.length, experiences: items.map((i) => i.title), total: grand, via_chat: contact.source === "chat", path: "cart_whatsapp" });
+    markChatConverted();
+    setDone(true);
   }
 
   return (
@@ -162,13 +143,13 @@ function Page() {
           {done ? (
             <div className="bg-card p-10 text-center shadow-lg">
               <CheckCircle className="mx-auto size-14 text-primary" />
-              <h2 className="mt-5 text-2xl font-bold">Payment successful — all bookings confirmed</h2>
-              <p className="mt-3 text-muted-foreground">Confirmation emails are on their way. Our team will contact you with trip details.</p>
+              <h2 className="mt-5 text-2xl font-bold">Almost done — send it on WhatsApp</h2>
+              <p className="mt-3 text-muted-foreground">WhatsApp has opened with your full cart filled in — just press Send. Our team will confirm availability and payment.</p>
             </div>
           ) : items.length === 0 ? (
             <div className="bg-card p-10 text-center shadow-lg">
               <h2 className="text-2xl font-bold">Your cart is empty</h2>
-              <p className="mt-3 text-muted-foreground">Pick a cruise or activity, choose a date and tap “Add to cart”.</p>
+              <p className="mt-3 text-muted-foreground">Pick a cruise or activity and tap “Book on WhatsApp” — we will confirm everything on chat.</p>
               <div className="mt-6 flex justify-center gap-3">
                 <Button asChild><Link to="/cruises">Browse cruises</Link></Button>
                 <Button asChild variant="outline"><Link to="/activities">Browse activities</Link></Button>
@@ -259,7 +240,7 @@ function Page() {
                   <p className="text-muted-foreground">{items.length} experience(s)</p>
                   <p className="text-lg font-bold">Total: ₹{grand.toLocaleString("en-IN")}</p>
                 </div>
-                <Button size="lg" disabled={busy || !grand}>Pay ₹{grand.toLocaleString("en-IN")} & Book All</Button>
+                <Button size="lg" disabled={busy || !items.length} className="bg-[#25D366] text-white hover:bg-[#1ebe5b]">Book All on WhatsApp{grand ? ` · ₹${grand.toLocaleString("en-IN")}` : ""}</Button>
                 {status && <p role="status" className="text-sm">{status}</p>}
               </form>
             </div>

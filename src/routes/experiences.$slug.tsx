@@ -3,6 +3,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { CalendarDays, Clock, MapPin, Users, Volume2, VolumeX } from "lucide-react";
 import { CardsGrid, HeroBanner, SectionHeading } from "@/components/site/sections";
 import { BookingForm } from "@/components/site/BookingForm";
+import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { Lightbox } from "@/components/site/Lightbox";
 import { seo, breadcrumbLd, experienceLd } from "@/lib/seo";
 import { experienceBySlug } from "@/lib/site-data";
@@ -232,7 +233,9 @@ function Page() {
             <p className="text-sm font-bold uppercase text-primary">Book this experience</p>
             <h2 className="mt-2 text-3xl font-bold">{x.price}</h2>
             {x.priceNote && <p className="mt-2 text-sm text-muted-foreground">{x.priceNote}</p>}
-            <div className="mt-6">
+            <WhatsAppButton product={x} size="lg" className="mt-5 w-full" />
+            <p className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">or fill in your details</p>
+            <div className="mt-4">
               <BookingForm lockedTitle={x.title} compact />
             </div>
           </aside>

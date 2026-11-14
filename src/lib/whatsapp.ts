@@ -1,6 +1,8 @@
-// WhatsApp number that receives booking-form details (country code + number, digits only, no "+").
-// Change this one line to send bookings to a different WhatsApp number.
-export const BOOKING_WHATSAPP_NUMBER = "917827629643";
+import { SITE_URL } from "@/lib/seo";
+
+// WhatsApp number that receives every booking / product enquiry on the site
+// (country code + number, digits only, no "+"). Change this one line to switch numbers.
+export const BOOKING_WHATSAPP_NUMBER = "917087288214";
 
 export function whatsappLink(text: string, number: string = BOOKING_WHATSAPP_NUMBER) {
   return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
@@ -13,4 +15,20 @@ export function openWhatsApp(text: string, number?: string) {
   const w = window.open(url, "_blank");
   if (w) w.opener = null;
   else window.location.href = url;
+}
+
+type ProductLike = { title: string; slug: string; kind?: string; price?: string; location?: string; timing?: string };
+
+// Pre-typed message for "Book on WhatsApp" buttons on cruises, activities and combos.
+export function productMessage(p: ProductLike) {
+  const path = p.kind === "Combo" ? `/combos/${p.slug}` : `/experiences/${p.slug}`;
+  return [
+    `Hi Canopus Marine! I'm interested in *${p.title}*${p.kind ? ` (${p.kind})` : ""}.`,
+    ...(p.price ? [`Price: ${p.price}`] : []),
+    ...(p.location ? [`Location: ${p.location}`] : []),
+    ...(p.timing ? [`Timing: ${p.timing}`] : []),
+    `Link: ${SITE_URL}${path}`,
+    "",
+    "Please share availability and booking details.",
+  ].join("\n");
 }

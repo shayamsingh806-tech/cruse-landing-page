@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { CalendarDays, Clock, MapPin, Users } from "lucide-react";
 import { HeroBanner, SectionHeading, CardsGrid, Kicker } from "@/components/site/sections";
 import { BookingForm } from "./BookingForm";
+import { WhatsAppButton } from "./WhatsAppButton";
 import { combos, comboOffers, comboSafety, comboPriceNote } from "@/lib/combos";
 import { useExperiences } from "@/lib/use-experiences";
 
@@ -57,7 +58,9 @@ export function ComboDetailPlaceholder({ name }: { name: string }) {
         <aside className="h-fit bg-card p-7 shadow-lg lg:sticky lg:top-28">
           <p className="text-sm font-bold uppercase text-primary">Book this experience</p>
           <h2 className="mt-2 text-3xl font-bold">{x.price}</h2><p className="mt-2 text-sm text-muted-foreground">{comboPriceNote}</p>
-          <div className="mt-6"><BookingForm lockedTitle={x.title} compact /></div>
+          <WhatsAppButton product={x} size="lg" className="mt-5 w-full" />
+          <p className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">or fill in your details</p>
+          <div className="mt-4"><BookingForm lockedTitle={x.title} compact /></div>
         </aside>
       </div>
     </section>
