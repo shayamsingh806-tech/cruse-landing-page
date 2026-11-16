@@ -1,6 +1,8 @@
 import { MessageCircle } from "lucide-react";
 import { productMessage, whatsappLink } from "@/lib/whatsapp";
 
+const priceValue = (p?: string) => p?.replace(/,/g, "").match(/₹\s*(\d+)/)?.[1];
+
 type Props = {
   product: Parameters<typeof productMessage>[0];
   label?: string;
@@ -17,6 +19,9 @@ export function WhatsAppButton({ product, label = "Book on WhatsApp", size = "sm
       target="_blank"
       rel="noreferrer"
       aria-label={`${label}: ${product.title}`}
+      data-lead-source="product_button"
+      data-lead-item={product.title}
+      data-lead-value={priceValue(product.price)}
       className={`inline-flex items-center justify-center gap-2 rounded-md bg-[#25D366] font-bold text-white shadow-sm transition-colors hover:bg-[#1ebe5b] ${sizing} ${className}`}
     >
       <MessageCircle className={size === "lg" ? "size-5" : "size-4"} />

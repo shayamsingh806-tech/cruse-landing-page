@@ -16,6 +16,7 @@ import { createCartOrder, confirmCartBooking } from "@/lib/payments.functions";
 import { chatAttribution, markChatConverted } from "@/lib/chat-attribution";
 import { trackChatEvent } from "@/lib/chat-events";
 import { openWhatsApp } from "@/lib/whatsapp";
+import { trackLead } from "@/lib/analytics";
 
 export const Route = createFileRoute("/cart")({
   validateSearch: (s: Record<string, unknown>): { saved?: string; ref?: string } => ({
@@ -130,6 +131,7 @@ function Page() {
       "Please confirm availability and share payment details.",
     ].join("\n");
     openWhatsApp(message);
+    trackLead("whatsapp", "cart", { value: grand || undefined, items: items.length, item_name: items.map((i) => i.title).join(", ") });
     trackChatEvent("checkout_start", { items: items.length, experiences: items.map((i) => i.title), total: grand, via_chat: contact.source === "chat", path: "cart_whatsapp" });
     markChatConverted();
     setDone(true);

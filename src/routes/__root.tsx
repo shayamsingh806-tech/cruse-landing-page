@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteChrome } from "../components/site/SiteChrome";
 import { images } from "../lib/assets";
 import { organizationLd } from "../lib/seo";
+import { GTM_ID, gtmHeadScript, installLinkLeadTracking } from "../lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -101,7 +102,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=DM+Sans:wght@400;500;600;700&family=Figtree:wght@400;500;600&family=Outfit:wght@600;700&display=swap" },
     ],
-    scripts: [organizationLd],
+    // Google Tag Manager first, so it loads as early as possible.
+    scripts: [{ children: gtmHeadScript }, organizationLd],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -116,6 +118,9 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <noscript>
+          <iframe src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`} height="0" width="0" style={{ display: "none", visibility: "hidden" }} title="Google Tag Manager" />
+        </noscript>
         {children}
         <Scripts />
       </body>
@@ -127,6 +132,9 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isAdmin = pathname.startsWith("/admin");
+
+  // Lead tracking: WhatsApp / phone / email link clicks → dataLayer "generate_lead".
+  useEffect(() => installLinkLeadTracking(), []);
 
   // Discourage image copying: block right-click, drag and copy on images.
   useEffect(() => {

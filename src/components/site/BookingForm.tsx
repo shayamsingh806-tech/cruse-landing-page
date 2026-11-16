@@ -13,6 +13,7 @@ import { createPaymentOrder, confirmPaidBooking, submitBookingRequest } from "@/
 import { chatAttribution, markChatConverted } from "@/lib/chat-attribution";
 import { trackChatEvent } from "@/lib/chat-events";
 import { openWhatsApp, whatsappLink } from "@/lib/whatsapp";
+import { trackLead } from "@/lib/analytics";
 
 type RzpResp = { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string };
 declare global {
@@ -126,6 +127,7 @@ export function BookingForm({ lockedTitle, compact }: { lockedTitle?: string | u
     ];
     const message = lines.join("\n");
     openWhatsApp(message);
+    trackLead("whatsapp", kind === "booking" ? "booking_form" : "booking_form_enquiry", { item_name: experience, value: total ?? undefined, guests: guestCount, booking_date: date });
     trackChatEvent("checkout_start", { experience, guests: guestCount, total: total ?? 0, via_chat: chatAttribution() === "chat", path: `booking_form_whatsapp_${kind}` });
     // Also keep a copy in the database when the server allows it (ignored if not configured).
     submitRequest({
@@ -158,7 +160,7 @@ export function BookingForm({ lockedTitle, compact }: { lockedTitle?: string | u
           {done.paid ? "Thank you! Our team will contact you with your trip details." : "WhatsApp has opened with your details filled in — just press Send. Our team will confirm availability."}
         </p>
         <Button asChild size="lg" className="mt-6">
-          <a href={whatsappLink(done.message)} target="_blank" rel="noreferrer">
+          <a href={whatsappLink(done.message)} target="_blank" rel="noreferrer" data-lead-skip>
             Open WhatsApp again
           </a>
         </Button>
