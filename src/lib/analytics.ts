@@ -2,11 +2,16 @@
 // Every lead pushes `event: "generate_lead"` to the dataLayer, so in GTM you only need
 // one Custom Event trigger ("generate_lead") for GA4 / Google Ads / Meta conversion tags.
 export const GTM_ID = "GTM-TL2XV3S3";
+// Google Ads: account tag + "Outbound click" conversion action.
+export const ADS_ID = "AW-17388414785";
+export const ADS_LEAD_CONVERSION = "AW-17388414785/lClzCKDB5rkdEMHOuONA";
 
 type Params = Record<string, unknown>;
 declare global {
   interface Window {
     dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+    gtag_report_conversion?: (url?: string) => boolean;
   }
 }
 
@@ -24,10 +29,18 @@ export function trackLead(method: "whatsapp" | "phone" | "email" | "form", sourc
     page_path: typeof location !== "undefined" ? location.pathname : undefined,
     ...params,
   });
+  // Google Ads "Outbound click" conversion for every lead.
+  window.gtag_report_conversion?.();
 }
 
-/** Standard GTM head snippet (plus the gtag() helper from the provided tag). */
+/** Google Ads base tag script (loaded async in <head>). */
+export const adsTagSrc = `https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`;
+
+/** GTM head snippet + Google Ads config + Google's gtag_report_conversion() event snippet. */
 export const gtmHeadScript = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());
+gtag('config','${ADS_ID}');
+function gtag_report_conversion(url){var callback=function(){if(typeof(url)!='undefined'){window.location=url;}};gtag('event','conversion',{'send_to':'${ADS_LEAD_CONVERSION}','value':1.0,'currency':'INR','event_callback':callback});return false;}
+window.gtag_report_conversion=gtag_report_conversion;
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`;
 
 /**
