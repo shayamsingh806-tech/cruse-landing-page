@@ -6,7 +6,7 @@ import { BookingForm } from "@/components/site/BookingForm";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { Highlights, OfferPrice, RatingBadge } from "@/components/site/OfferBits";
 import { Lightbox } from "@/components/site/Lightbox";
-import { seo, breadcrumbLd, experienceLd } from "@/lib/seo";
+import { seo, breadcrumbLd, experienceLd, faqLd } from "@/lib/seo";
 import { experienceBySlug } from "@/lib/site-data";
 import { useExperiences } from "@/lib/use-experiences";
 import { suggestFor } from "@/lib/cart";
@@ -72,8 +72,8 @@ export const Route = createFileRoute("/experiences/$slug")({
     return item;
   },
   head: ({ loaderData, params }) => {
-    const title = `${loaderData?.fullTitle ?? loaderData?.title ?? "Experience"} | Canopus Marine`;
-    const desc = loaderData?.overview ?? "Explore the Andaman Sea with Canopus Marine.";
+    const title = loaderData?.seoTitle ?? `${loaderData?.fullTitle ?? loaderData?.title ?? "Experience"} | Canopus Marine`;
+    const desc = loaderData?.seoDescription ?? loaderData?.overview ?? "Explore the Andaman Sea with Canopus Marine.";
     const path = `/experiences/${params.slug}`;
     const parent: [string, string] = loaderData?.kind === "Cruise" ? ["Cruises", "/cruises"] : ["Activities", "/activities"];
     return {
@@ -88,6 +88,7 @@ export const Route = createFileRoute("/experiences/$slug")({
       scripts: [
         breadcrumbLd([["Home", "/"], parent, [loaderData?.title ?? "Experience", path]]),
         ...(loaderData ? [experienceLd(loaderData)] : []),
+        ...(loaderData?.faqs?.length ? [faqLd(loaderData.faqs)] : []),
       ],
     };
   },
@@ -132,6 +133,13 @@ function Page() {
               {x.reporting && <Fact icon={<Users />} label="Guest notes" value={x.limits} />}
             </div>
 
+            {x.sections?.map((sec) => (
+              <section key={sec.heading} className="mt-12">
+                <h2 className="text-2xl font-bold">{sec.heading}</h2>
+                {sec.body.map((p) => <p key={p.slice(0, 40)} className="mt-4 leading-7 text-muted-foreground">{p}</p>)}
+              </section>
+            ))}
+
             <div className="mt-12 grid gap-10 md:grid-cols-2">
               <div>
                 <h2 className="text-2xl font-bold">What's included</h2>
@@ -167,6 +175,23 @@ function Page() {
                   ))}
                 </ul>
               </div>
+            )}
+
+            {x.faqs && x.faqs.length > 0 && (
+              <section className="mt-14">
+                <h2 className="text-2xl font-bold">{x.fullTitle ?? x.title} — FAQs</h2>
+                <div className="mt-6 divide-y divide-border rounded-xl border border-border bg-card">
+                  {x.faqs.map((f, i) => (
+                    <details key={f.q} className="group p-5" open={i === 0}>
+                      <summary className="cursor-pointer list-none font-semibold text-foreground marker:hidden">
+                        <h3 className="inline text-base">{f.q}</h3>
+                        <span className="float-right text-primary transition-transform group-open:rotate-45">+</span>
+                      </summary>
+                      <p className="mt-3 leading-7 text-muted-foreground">{f.a}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
             )}
 
             {gallery && (

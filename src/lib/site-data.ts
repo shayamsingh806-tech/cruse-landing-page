@@ -27,7 +27,14 @@ export type Experience = {
   /** Customer rating badge, e.g. { score: 5, count: "3,000+" }. */
   rating?: { score: number; count: string };
   /** Fields where this code copy wins over the database copy (e.g. a corrected location). */
-  pinned?: Array<"location" | "overview" | "timing" | "duration" | "limits">;
+  pinned?: Array<"location" | "overview" | "timing" | "duration" | "limits" | "fullTitle" | "alt">;
+  /** SEO: <title> and meta description overrides for the experience page. */
+  seoTitle?: string;
+  seoDescription?: string;
+  /** Extra long-form sections (H2 + paragraphs) shown on the experience page. */
+  sections?: { heading: string; body: string[] }[];
+  /** FAQs shown on the page and published as FAQPage structured data. */
+  faqs?: { q: string; a: string }[];
 };
 
 export const cruises: Experience[] = [
@@ -51,7 +58,33 @@ export const activities: Experience[] = [
   { slug: "flying-board", title: "Flying Board", kind: "Activity", category: "Adventure", image: images.flyingBoard, alt: "Rider soaring on a flyboard above turquoise water near towering cliffs", location: "Havelock Island", timing: "Daily, weather and sea conditions permitting", duration: "Water activity", price: "₹4,700 per person", originalPrice: "₹5,500 per person", highlights: ["VIP access to all the activities at Elephant Beach"], rating: { score: 5, count: "3,000+" }, limits: "Ask our team for today's availability", overview: "Rise above the water on a thrilling flying board experience, subject to weather and sea conditions." },
   { slug: "underwater-scooter", title: "Underwater Scooter", kind: "Activity", category: "Underwater", image: images.underwaterScooter, alt: "Diver gliding with an underwater scooter over a coral reef in clear blue water", location: "Havelock Island", timing: "Daily, weather and sea conditions permitting", duration: "Underwater experience", price: "₹5,500 per person", limits: "Ask our team for today's availability", overview: "Explore below the surface on an underwater scooter experience, subject to weather and sea conditions." },
   { slug: "kayaking-day", title: "Kayaking Day", kind: "Activity", category: "Adventure", image: images.kayakingDay, alt: "Kayaker paddling turquoise tropical water past green islands", location: "Havelock Island", timing: "Morning & afternoon sessions", duration: "1–2 hours", price: "From ₹2,500", limits: "All ages welcome", overview: "Paddle a kayak through calm turquoise water along mangroves and the island coastline." },
-  { slug: "kayaking-night", title: "Kayaking Night", kind: "Activity", category: "Adventure", image: images.kayakingNight, alt: "Glow-lit kayaks drifting on moonlit water between dark cliffs at night", location: "Govind Nagar Beach No. 2, Havelock Island", timing: "After sunset", duration: "1.5–2 hours", price: "₹2,500 per person", originalPrice: "₹3,500 per person", rating: { score: 5, count: "3,000+" }, pinned: ["location", "overview"], limits: "Basic water confidence advised", overview: "Glide over glowing bioluminescent waters under the stars on a guided night paddle from Govind Nagar Beach No. 2 on Havelock Island." },
+  { slug: "kayaking-night", title: "Kayaking Night", fullTitle: "Bioluminescence Night Kayaking in Havelock", kind: "Activity", category: "Adventure", image: images.kayakingNight, alt: "Bioluminescence night kayaking in Havelock — glowing kayaks on dark water at Govind Nagar Beach No. 2", location: "Govind Nagar Beach No. 2, Havelock Island", timing: "After sunset", duration: "1.5–2 hours", price: "₹2,500 per person", originalPrice: "₹3,500 per person", rating: { score: 5, count: "3,000+" }, pinned: ["location", "overview", "fullTitle", "alt"], limits: "Basic water confidence advised",
+    seoTitle: "Night Kayaking in Havelock – Bioluminescence Kayaking | Canopus Marine",
+    seoDescription: "Bioluminescence night kayaking in Havelock from Govind Nagar Beach No. 2 — a guided 1.5–2 hour paddle after sunset. Now ₹2,500 per person. Rated 5★ by 3,000+ guests.",
+    overview: "Night kayaking in Havelock is a guided 1.5–2 hour paddle after sunset from Govind Nagar Beach No. 2, where on dark nights the sea glows blue-green with bioluminescent plankton around every paddle stroke. Our bioluminescence kayaking in Havelock is led by an experienced crew with a safety briefing and equipment provided, and costs ₹2,500 per person (offer price, regular ₹3,500).",
+    sections: [
+      { heading: "What is bioluminescence night kayaking in Havelock?", body: [
+        "Bioluminescence is natural light made by tiny marine plankton. When the water around them is disturbed — by a paddle, your hand or the kayak itself — they flash a soft blue-green glow. On a bioluminescence night kayaking trip in Havelock you paddle through calm, dark water and watch the sea light up around you.",
+        "Havelock night kayaking with Canopus Marine is a guided group experience: our crew briefs you on safety, hands out the equipment and paddles with you for the whole session.",
+      ] },
+      { heading: "Where does night kayaking in Havelock start?", body: [
+        "Our night kayaking in Havelock starts from Govind Nagar Beach No. 2 on Havelock Island (Swaraj Dweep). Share your hotel name when you book and our team will tell you the exact meeting point and reporting time for your session.",
+      ] },
+      { heading: "Best time for bioluminescence kayaking in Havelock", body: [
+        "Sessions run after sunset. Bioluminescence is easiest to see on dark nights, so the days around the new moon are usually best, while bright full-moon nights and city-style light make the glow harder to spot. Because it is a natural phenomenon, the brightness changes from night to night, and every trip depends on weather and sea conditions.",
+      ] },
+      { heading: "What to bring for night kayaking in Havelock", body: [
+        "Wear quick-dry clothes you don't mind getting wet, and bring a change of clothes, a small towel, insect repellent and a waterproof pouch for your phone. Please tell us about any medical conditions before the trip, and follow the crew's instructions on the water.",
+      ] },
+    ],
+    faqs: [
+      { q: "How much does night kayaking in Havelock cost?", a: "Bioluminescence night kayaking in Havelock with Canopus Marine costs ₹2,500 per person (special offer, regular price ₹3,500 per person). The session lasts about 1.5–2 hours." },
+      { q: "Where is bioluminescence kayaking done in Havelock?", a: "Our bioluminescence kayaking in Havelock starts from Govind Nagar Beach No. 2 on Havelock Island (Swaraj Dweep). We confirm the exact meeting point and reporting time when you book." },
+      { q: "What time does Havelock night kayaking start and how long is it?", a: "Havelock night kayaking starts after sunset and lasts about 1.5–2 hours, including the safety briefing." },
+      { q: "Is bioluminescence guaranteed on a night kayaking trip?", a: "No. Bioluminescence is natural, so how bright it glows changes from night to night. It is usually easiest to see on dark nights around the new moon and harder to see on bright full-moon nights." },
+      { q: "Do I need experience for night kayaking in Havelock?", a: "The trip is guided by our crew with a safety briefing and equipment provided. Basic water confidence is advised. Please tell us about any medical conditions before you book." },
+      { q: "How do I book night kayaking in Havelock?", a: "Tap “Book on WhatsApp” on this page or fill in the booking form with your date and number of guests. Our team confirms availability, timing and the meeting point on WhatsApp. Sessions depend on weather and sea conditions, so booking early is recommended." },
+    ] },
   { slug: "dragon-ride", title: "Dragon Ride", kind: "Activity", category: "Group Rides", image: images.dragonRide, alt: "Guests riding a yellow and red inflatable dragon towed across turquoise water near rocky cliffs", location: "Havelock Island", timing: "Daily, weather permitting", duration: "10–15 minutes", price: "From ₹800", limits: "Minimum age applies", overview: "A towed inflatable dragon that bounces over the waves — great for groups and families." },
   { slug: "disco-ride", title: "Disco Ride", kind: "Activity", category: "Group Rides", image: images.discoRide, alt: "Group riding a large round inflatable towed by a speedboat", location: "Havelock Island", timing: "Daily, weather permitting", duration: "10–15 minutes", price: "From ₹800", limits: "Minimum age applies", overview: "A big round disco raft that spins and bounces behind the speedboat — pure group fun." },
   { slug: "dolphin-ride", title: "Dolphin Ride", kind: "Activity", category: "Group Rides", image: images.dolphinRide, alt: "Inflatable dolphin ride carrying riders across bright blue water", location: "Havelock Island", timing: "Daily, weather permitting", duration: "10–15 minutes", price: "From ₹3,500", limits: "Minimum age applies", overview: "Ride the friendly inflatable dolphin as it skips across the waves — a favourite with families." },
