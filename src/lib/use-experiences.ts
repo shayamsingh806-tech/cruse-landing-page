@@ -48,6 +48,7 @@ export function mergeExperiences(rows: ExperienceRow[] | undefined): Experience[
       x.inclusions = [...inc, ...s.highlights.filter((h) => !inc.includes(h))];
     }
     if (s?.rating) x.rating = s.rating;
+    for (const k of s?.pinned ?? []) x[k] = s![k];
     return x;
   };
   const bySlug = new Map(visible.map((r) => [r.slug, withFallback(r)]));
