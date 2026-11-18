@@ -15,7 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteChrome } from "../components/site/SiteChrome";
 import { images } from "../lib/assets";
 import { organizationLd } from "../lib/seo";
-import { GTM_ID, adsTagSrc, gtmHeadScript, installLinkLeadTracking } from "../lib/analytics";
+import { GTM_IDS, adsTagSrc, gtmHeadScript, installLinkLeadTracking } from "../lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -119,7 +119,9 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         <noscript>
-          <iframe src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`} height="0" width="0" style={{ display: "none", visibility: "hidden" }} title="Google Tag Manager" />
+          {GTM_IDS.map((id) => (
+            <iframe key={id} src={`https://www.googletagmanager.com/ns.html?id=${id}`} height="0" width="0" style={{ display: "none", visibility: "hidden" }} title="Google Tag Manager" />
+          ))}
         </noscript>
         {children}
         <Scripts />

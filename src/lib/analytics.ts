@@ -1,7 +1,10 @@
 // Google Tag Manager + lead tracking.
 // Every lead pushes `event: "generate_lead"` to the dataLayer, so in GTM you only need
 // one Custom Event trigger ("generate_lead") for GA4 / Google Ads / Meta conversion tags.
-export const GTM_ID = "GTM-TL2XV3S3";
+// Google Tag Manager containers loaded on every page (they share one dataLayer).
+// GTM-TL2XV3S3: lead tracking container · GTM-K4T3CSSW: Google Analytics container.
+export const GTM_IDS = ["GTM-TL2XV3S3", "GTM-K4T3CSSW"] as const;
+export const GTM_ID = GTM_IDS[0];
 // Google Ads: account tag + "Outbound click" conversion action.
 export const ADS_ID = "AW-17388414785";
 export const ADS_LEAD_CONVERSION = "AW-17388414785/lClzCKDB5rkdEMHOuONA";
@@ -41,7 +44,7 @@ export const gtmHeadScript = `window.dataLayer=window.dataLayer||[];function gta
 gtag('config','${ADS_ID}');
 function gtag_report_conversion(url){var callback=function(){if(typeof(url)!='undefined'){window.location=url;}};gtag('event','conversion',{'send_to':'${ADS_LEAD_CONVERSION}','value':1.0,'currency':'INR','event_callback':callback});return false;}
 window.gtag_report_conversion=gtag_report_conversion;
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`;
+${GTM_IDS.map((id) => `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${id}');`).join("\n")}`;
 
 /**
  * Counts clicks on WhatsApp, phone and email links anywhere on the site as leads.
